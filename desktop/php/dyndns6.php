@@ -99,15 +99,22 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
 				<option value="ovhcom">www.ovh.com</option>
                 <option value="duckdns">www.duckdns.org</option>
                 <option value="stratocom">www.strato.com</option>
+                <option value="gandinet">www.gandi.net</option>
             </select>
         </div>
     </div>
-    <div class="serviceType dyndnsorg noipcom ovhcom duckdns stratocom">
+    <div class="serviceType dyndnsorg noipcom ovhcom duckdns stratocom gandinet">
         <div class="form-group">
             <label class="col-sm-3 control-label">{{Hostname}}</label>
             <div class="col-sm-3">
                 <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="hostname" />
             </div>
+        </div>
+        <div class="form-group serviceType gandinet">
+            <label class="col-sm-3 control-label">{{Domainname}}</label>
+            <div class="col-sm-3">
+                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="domainname" />
+             </div>
         </div>
         <div class="form-group serviceType dyndnsorg noipcom ovhcom stratocom">
             <label class="col-sm-3 control-label">{{Nom d'utilisateur}}</label>
@@ -121,7 +128,7 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
                 <input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="password" />
             </div>
         </div>
-		<div class="form-group serviceType duckdns">
+		<div class="form-group serviceType duckdns gandinet">
             <label class="col-sm-3 control-label">{{Token}}</label>
             <div class="col-sm-3">
                 <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="token" />

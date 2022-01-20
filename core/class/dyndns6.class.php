@@ -25,18 +25,19 @@ class dyndns6 extends eqLogic {
 	/*     * ***********************Methode static*************************** */
 
 	public static function getExternalIP() {
-		try {
-			$request_http = new com_http('http://checkip.dyndns.com/');
-			$externalContent = $request_http->exec(8, 1);
-			preg_match('/Current IP Address: \[?([:.0-9a-fA-F]+)\]?/', $externalContent, $m);
-			if (isset($m[1])) {
-				return $m[1];
-			}
-		} catch (Exception $e) {
-
+		$url = config::byKey('service::cloud::url').'/service/myip';
+      		$request_http = new com_http($url);
+      		$request_http->setHeader(array('Content-Type: application/json','Autorization: '.sha512(mb_strtolower(config::byKey('market::username')).':'.config::byKey('market::password'))));
+      		$data = $request_http->exec(30,1);
+		$result = is_json($data, $data);
+		if(isset($result['state']) && $result['state'] != 'ok'){
+		      throw new \Exception(__('Erreur lors de la requete au serveur cloud Jeedom : ',__FILE__).$data);
 		}
-		$request_http = new com_http('http://ip1.dynupdate.no-ip.com/');
-		return $request_http->exec(8, 1);
+		if(isset($result['data']) && isset($result['data']['ip'])){
+			//log::add('dyndns6','debug','getExternalIP  result: ' . $result['data']['ip']);
+			return $result['data']['ip'];
+		}
+		throw new \Exception(__('impossible de recuperer votre ip externe : ',__FILE__).$data);
 	}
 
 	public static function getExternalIP6() {
@@ -58,7 +59,7 @@ class dyndns6 extends eqLogic {
 
 	public static function cron15($_eqLogic_id = null, $_force = false) {
 		if ($_eqLogic_id == null) {
-			$eqLogics = self::byType('dyndns6');
+			$eqLogics = self::byType('dyndns6',true);
 		} else {
 			$eqLogics = array(self::byId($_eqLogic_id));
 		}
@@ -68,9 +69,12 @@ class dyndns6 extends eqLogic {
 			if (!is_object($externalIP)) {
 				continue;
 			}
-			if ($_force || $externalIP->execCmd() != $externalIP->formatValue($current_externalIP)) {
+			$ip = $externalIP->execCmd();
+			if ($_force || $ip != $externalIP->formatValue($current_externalIP)) {
+				log::add('dyndns6','debug','IP sauvee: ' .$ip. ', IP courante: ' . $externalIP->formatValue($current_externalIP) );
 				$externalIP->setCollectDate('');
 				$externalIP->event($current_externalIP);
+				log::add('dyndns6','debug','Mise à jour de l\'adresse IP:' );
 				$eqLogic->updateIP();
 			}
 		}
@@ -99,7 +103,7 @@ class dyndns6 extends eqLogic {
 		}
 
 		$current_externalIP = self::getExternalIP();
-		log::add('dyndns6','debug','External IPv4: ' . $current_externalIP);
+		//log::add('dyndns6','debug','External IPv4: ' . $current_externalIP);
 
 		foreach ($eqLogics as $eqLogic) {
 			$externalIP6 = $eqLogic->getCmd(null, 'externalIP6');
@@ -108,7 +112,7 @@ class dyndns6 extends eqLogic {
 			}
 			if ($eqLogic->getConfiguration("ipv6") > 0){
 				$current_externalIP6 = self::getExternalIP6();
-				log::add('dyndns6','debug','External IPv6: ' . $current_externalIP6);
+				//log::add('dyndns6','debug','External IPv6: ' . $current_externalIP6);
 			}
 		}
 	}
@@ -199,9 +203,9 @@ class dyndns6 extends eqLogic {
 				break;
 			case 'noipcom':
 				if ($flagipv6){
-					$url = 'https://' . 'dynupdate.no-ip.com/nic/update?hostname=' . $this->getConfiguration('hostname') . '&myip=' . $ip . ',' . $ip6;
+					$url = 'https://dynupdate.no-ip.com/nic/update?hostname=' . $this->getConfiguration('hostname') . '&myip=' . $ip . ',' . $ip6;
 				} else {
-					$url = 'https://' . 'dynupdate.no-ip.com/nic/update?hostname=' . $this->getConfiguration('hostname') . '&myip=' . $ip;
+					$url = 'https://dynupdate.no-ip.com/nic/update?hostname=' . $this->getConfiguration('hostname') . '&myip=' . $ip;
 				}
 				log::add('dyndns6', 'debug', $url);
 				$request_http = new com_http($url,$this->getConfiguration('username'),$this->getConfiguration('password'));           	
@@ -243,6 +247,19 @@ class dyndns6 extends eqLogic {
       				throw new Exception(__('Erreur de mise à jour de strato.com : ', __FILE__) . $result);
       			}
       			break;
+     		case 'gandinet':
+				$url = 'https://dns.api.gandi.net/api/v5/domains/' . $this->getConfiguration('domainname') . '/records/' . $this->getConfiguration('hostname') .'/A';
+				$payload = array('rrset_type'=>'A','rrset_ttl'=>'3600','rrset_name'=>$this->getConfiguration('hostname'),'rrset_values'=>array($ip));
+				$payload_json = json_encode($payload);
+				$request_http = new com_http($url);
+				$request_http->setUserAgent('Jeedom dyndns plugin');
+				$request_http->setHeader(array('Content-Type: application/json', 'Content-Length: ' . strlen($payload_json), 'X-API-Key:' . $this->getConfiguration('token')));
+				$request_http->setPut($payload_json);
+				$result = $request_http->exec();
+				if (strpos($result, 'error') !== false) {
+					throw new Exception(__('Erreur de mise à jour de gandinet : ' . $url, __FILE__) . $result);
+				}
+				break;
 		}
 	}
 

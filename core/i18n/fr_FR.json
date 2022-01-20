@@ -1,0 +1,46 @@
+{
+    "plugins\/dyndns\/desktop\/php\/dyndns.php": {
+        "401 - Accès non autorisé": "401 - Accès non autorisé",
+        "Gestion": "Gestion",
+        "Ajouter": "Ajouter",
+        "Mes dyndns": "Mes dyndns",
+        "Rechercher": "Rechercher",
+        "Configuration avancée": "Configuration avancée",
+        "Dupliquer": "Dupliquer",
+        "Sauvegarder": "Sauvegarder",
+        "Supprimer": "Supprimer",
+        "Equipement": "Equipement",
+        "Commandes": "Commandes",
+        "Nom de l'équipement dyndns": "Nom de l'équipement dyndns",
+        "Objet parent": "Objet parent",
+        "Aucun": "Aucun",
+        "Catégorie": "Catégorie",
+        "Activer": "Activer",
+        "Visible": "Visible",
+        "Service": "Service",
+        "Hostname": "Hostname",
+        "Nom d'utilisateur": "Nom d'utilisateur",
+        "Mot de passe": "Mot de passe",
+        "Token": "Token",
+        "Nom": "Nom",
+        "Type": "Type",
+        "Action": "Action"
+    },
+    "plugins\/dyndns\/desktop\/js\/dyndns.js": {
+        "Afficher": "Afficher",
+        "Tester": "Tester"
+    },
+    "plugins\/dyndns\/core\/class\/dyndns.class.php": {
+        "Mettre à jour": "Mettre à jour",
+        "IP": "IP",
+        "Commande externalIP inexistante": "Commande externalIP inexistante",
+        "Erreur de mise à jour de dyndns.org : ": "Erreur de mise à jour de dyndns.org : ",
+        "Erreur de mise à jour de noip.com : ": "Erreur de mise à jour de noip.com : ",
+        "Erreur de mise à jour de ovh.com : ": "Erreur de mise à jour de ovh.com : ",
+        "Erreur de mise à jour de duckdns : ' . $url": "Erreur de mise à jour de duckdns : ' . $url",
+        "Erreur de mise à jour de strato.com : ": "Erreur de mise à jour de strato.com : "
+    },
+    "info.json": {
+        "Plugin pour mettre à jour dynamiquement des DNS": "Plugin pour mettre à jour dynamiquement des DNS"
+    }
+}
