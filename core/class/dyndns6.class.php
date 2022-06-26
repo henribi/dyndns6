@@ -25,6 +25,19 @@ class dyndns6 extends eqLogic {
 	/*     * ***********************Methode static*************************** */
 
 	public static function getExternalIP() {
+		try {
+			$request_http = new com_http('http://checkip.dyndns.com/');
+			$externalContent = $request_http->exec(8, 1);
+			preg_match('/Current IP Address: \[?([:.0-9a-fA-F]+)\]?/', $externalContent, $m);
+			if (isset($m[1])) {
+				return $m[1];
+			}
+		} catch (Exception $e) {
+			
+		}
+		$request_http = new com_http('http://ip1.dynupdate.no-ip.com/');
+		return $request_http->exec(8, 1);
+		/***   via market:  Give problem if too many checker
 		$url = config::byKey('service::cloud::url').'/service/myip';
       		$request_http = new com_http($url);
       		$request_http->setHeader(array('Content-Type: application/json','Autorization: '.sha512(mb_strtolower(config::byKey('market::username')).':'.config::byKey('market::password'))));
@@ -38,6 +51,7 @@ class dyndns6 extends eqLogic {
 			return $result['data']['ip'];
 		}
 		throw new \Exception(__('impossible de recuperer votre ip externe : ',__FILE__).$data);
+		***/
 	}
 
 	public static function getExternalIP6() {
